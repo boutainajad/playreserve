@@ -1,0 +1,169 @@
+@extends('layouts.app')
+
+@section('title', 'My Dashboard')
+
+@section('content')
+
+<div class="mb-10">
+    <div class="bg-white border border-gray-200 rounded-[28px] p-8 shadow-sm flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-black text-[#0B1526] mb-1 tracking-tight">Hello, {{ auth()->user()->name }}!</h1>
+            <p class="text-gray-400 font-medium text-[16px]">Find your next court and manage your bookings.</p>
+        </div>
+        <div class="w-14 h-14 rounded-full bg-playtomic-blue/10 flex items-center justify-center text-playtomic-blue text-2xl">
+            <i class="bi bi-person-fill"></i>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <div class="lg:col-span-1">
+        <h2 class="text-xl font-black text-[#0B1526] mb-5 flex items-center gap-2">
+            <i class="bi bi-calendar-check-fill text-playtomic-blue"></i> My Reservations
+        </h2>
+
+        @if($reservations->count() > 0)
+            <div class="space-y-4">
+                @foreach($reservations as $res)
+                    <div class="bg-white border border-gray-100 rounded-[20px] p-5 shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <div class="text-lg font-black text-[#0B1526]">
+                                    {{ \Carbon\Carbon::parse($res->reservation_date)->format('d M Y') }}
+                                </div>
+                                <div class="text-sm font-bold text-playtomic-blue">
+                                    {{ \Carbon\Carbon::parse($res->start_time)->format('H:i') }} – {{ \Carbon\Carbon::parse($res->end_time)->format('H:i') }}
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg
+                                @if($res->status == 'confirmed') bg-green-100 text-green-700
+                                @elseif($res->status == 'pending') bg-yellow-100 text-yellow-700
+                                @else bg-red-100 text-red-700 @endif">
+                                {{ $res->status }}
+                            </span>
+                        </div>
+                        <div class="pt-3 border-t border-gray-50">
+                            <p class="font-bold text-[#0B1526] text-[15px]">{{ $res->terrain->name }}</p>
+                            <p class="text-sm text-gray-400 font-medium flex items-center gap-1.5 mt-1">
+                                <i class="bi bi-geo-alt-fill text-playtomic-lime"></i> {{ $res->terrain->club->name }}
+                            </p>
+                            <p class="font-black text-playtomic-blue text-base mt-2">{{ number_format($res->total_price, 0) }} DH</p>
+                        </div>
+                        
+                        @if(in_array($res->status, ['confirmed', 'pending']))
+                            @php
+                                $reservationDateTime = \Carbon\Carbon::parse($res->reservation_date)->setTimeFromTimeString($res->start_time);
+                                $isTooLate = now()->diffInHours($reservationDateTime, false) < 24;
+                            @endphp
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                <form action="{{ route('reservations.cancel', $res->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this reservation?')">
+                                    @csrf
+                                    <button type="submit" class="text-[12px] font-black {{ $isTooLate ? 'text-gray-300 cursor-not-allowed' : 'text-red-500 hover:text-red-700' }} flex items-center gap-1.5 transition-colors group">
+                                        <i class="bi {{ $isTooLate ? 'bi-lock-fill' : 'bi-x-circle-fill' }}"></i> 
+                                        CANCEL RESERVATION
+                                    </button>
+                                </form>
+                                
+                                @if($isTooLate)
+                                    <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">Fixed (< 24h)</span>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="bg-white border border-gray-100 rounded-[20px] p-10 text-center shadow-sm">
+                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="bi bi-calendar-x text-3xl text-gray-300"></i>
+                </div>
+                <p class="text-gray-400 font-bold text-sm">No reservations yet.</p>
+            </div>
+        @endif
+    </div>
+
+    <div class="lg:col-span-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+            <h2 class="text-xl font-black text-[#0B1526] flex items-center gap-2">
+                <i class="bi bi-buildings text-playtomic-blue"></i> All Clubs
+            </h2>
+
+            <form action="{{ route('dashboard') }}" method="GET" class="relative">
+                <select name="city" onchange="this.form.submit()"
+                    class="pl-10 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-playtomic-blue shadow-sm min-w-[190px]">
+                    <option value="">📍 All cities</option>
+                    @foreach($cities as $city)
+                        <option value="{{ $city }}" {{ request('city') == $city ? 'selected' : '' }}>{{ $city }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-playtomic-blue">
+                    <i class="bi bi-geo-alt-fill text-sm"></i>
+                </div>
+                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                    <i class="bi bi-chevron-down text-xs"></i>
+                </div>
+            </form>
+        </div>
+
+        @if(request('city'))
+            <div class="mb-4 flex items-center gap-2">
+                <span class="text-sm font-bold text-gray-500">Filtered by city: <span class="text-[#0B1526]">{{ request('city') }}</span></span>
+                <a href="{{ route('dashboard') }}" class="text-xs text-playtomic-blue font-bold underline underline-offset-4">Clear</a>
+            </div>
+        @endif
+
+        @if($clubs->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @foreach($clubs as $club)
+                    <div class="bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="h-36 bg-gradient-to-br from-playtomic-blue/5 to-playtomic-lime/10 relative flex items-center justify-center border-b border-gray-100 overflow-hidden">
+                            <i class="bi bi-buildings text-[80px] text-playtomic-blue/10 absolute"></i>
+                            <div class="absolute top-3 right-4 bg-playtomic-lime text-black px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide">
+                                {{ $club->city }}
+                            </div>
+                            <div class="absolute bottom-3 left-4 flex gap-1.5 flex-wrap">
+                                @foreach($club->terrains->pluck('sport_type')->unique() as $sport)
+                                    <span class="bg-white/80 backdrop-blur-sm border border-white px-2.5 py-1 rounded-full text-[10px] font-black text-playtomic-blue uppercase">
+                                        @if($sport=='football')⚽
+                                        @elseif($sport=='basketball')🏀
+                                        @elseif($sport=='volleyball')🏐
+                                        @elseif($sport=='handball')🤾
+                                        @elseif($sport=='piscine')🏊
+                                        @else🎯@endif
+                                        {{ $sport }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex flex-col flex-1">
+                            <h3 class="text-xl font-black text-[#0B1526] mb-1">{{ $club->name }}</h3>
+                            <p class="text-sm text-gray-400 font-medium line-clamp-2 mb-5">{{ $club->description }}</p>
+
+                            <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                                <span class="text-xs font-black text-gray-400 uppercase tracking-wide">
+                                    {{ $club->terrains->count() }} court{{ $club->terrains->count() > 1 ? 's' : '' }}
+                                </span>
+                                <a href="{{ route('clubs.show', $club->id) }}"
+                                   class="px-5 py-2.5 bg-playtomic-blue text-white font-black rounded-xl text-[13px] hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                    Book Now <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="bg-white border border-gray-100 rounded-[24px] p-16 text-center shadow-sm">
+                <i class="bi bi-search text-5xl text-gray-200 mb-4 block"></i>
+                <h4 class="text-lg font-bold text-gray-400">No clubs found in this city.</h4>
+                <a href="{{ route('dashboard') }}" class="text-playtomic-blue font-black mt-3 inline-block underline underline-offset-4 text-sm">See all clubs</a>
+            </div>
+        @endif
+    </div>
+
+</div>
+
+@endsection
