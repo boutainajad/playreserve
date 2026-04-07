@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    
+    --color-playtomic-neon: #DBF227;
+    --color-playtomic-neon-hover: #D6ED23;
+    --color-playtomic-dark: #121212;
+    --color-playtomic-darker: #0A0A0A;
+    --color-playtomic-card: #1E1E1E;
+    --color-playtomic-card-hover: #2A2A2A;
+    --color-playtomic-border: #2C2C2E;
+    --color-playtomic-text: #F3F3F3;
+    --color-playtomic-text-muted: #A0A0A5;
+}
+
+@layer base {
+    body {
+        @apply bg-playtomic-dark text-playtomic-text font-sans antialiased;
+    }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
