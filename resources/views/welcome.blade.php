@@ -159,9 +159,23 @@
                 
                 @forelse($clubs as $club)
                 <div class="bg-[#F8F9FB] border border-[#EAEDF1] rounded-[24px] overflow-hidden flex flex-col group relative shadow-sm hover:shadow-lg transition-all duration-300">
-                    <div class="p-8 flex flex-col flex-1">
-                        <div class="w-14 h-14 rounded-full bg-playtomic-blue/10 flex items-center justify-center text-playtomic-blue text-2xl mb-6">
-                            <i class="bi bi-building"></i>
+                    <div class="h-40 w-full relative bg-gray-100 overflow-hidden shrink-0 border-b border-[#EAEDF1]">
+                        @if($club->cover_image)
+                            <img src="{{ Storage::url($club->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        @else
+                            <div class="w-full h-full bg-gradient-to-tr from-playtomic-blue/5 to-playtomic-lime/10 flex items-center justify-center">
+                                <i class="bi bi-buildings text-[60px] text-playtomic-blue/10"></i>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <div class="p-8 pt-4 flex flex-col flex-1 relative">
+                        <div class="w-16 h-16 rounded-2xl bg-white shadow-md border-2 border-white flex items-center justify-center text-playtomic-blue text-2xl mb-4 -mt-12 relative z-10 overflow-hidden">
+                            @if($club->logo)
+                                <img src="{{ Storage::url($club->logo) }}" class="w-full h-full object-cover">
+                            @else
+                                <i class="bi bi-shop text-3xl"></i>
+                            @endif
                         </div>
                         
                         <h3 class="text-2xl font-black text-[#0B1526] mb-2">{{ $club->name }}</h3>

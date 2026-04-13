@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,7 +33,6 @@
 </head>
 <body class="font-sans text-playtomic-text bg-playtomic-bg antialiased flex flex-col min-h-screen">
 
-    <!-- Navbar -->
     <nav class="bg-white flex items-center justify-between px-6 lg:px-12 py-5 w-full border-b border-gray-100 shadow-sm sticky top-0 z-50">
         <div class="max-w-[1000px] mx-auto w-full flex items-center justify-between">
             <a href="<?php echo e(route('home')); ?>" class="flex items-center gap-2 text-playtomic-blue font-black text-xl tracking-wider uppercase">
@@ -41,7 +42,6 @@
         </div>
     </nav>
 
-    <!-- Content -->
     <main class="flex-1 flex justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-2xl w-full bg-white p-8 md:p-12 rounded-[32px] shadow-xl border border-gray-100 h-fit">
             
@@ -63,10 +63,9 @@
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="<?php echo e(route('register.owner')); ?>" class="space-y-8">
+            <form method="POST" action="<?php echo e(route('register.owner')); ?>" enctype="multipart/form-data" class="space-y-8">
                 <?php echo csrf_field(); ?>
                 
-                <!-- Personal Information -->
                 <div class="space-y-5">
                     <h3 class="text-lg font-bold text-playtomic-text border-b border-gray-100 pb-2">Personal Details</h3>
                     
@@ -96,13 +95,12 @@
                     </div>
                 </div>
 
-                <!-- Club Information -->
                 <div class="space-y-5 pt-2">
                     <h3 class="text-lg font-bold text-playtomic-text border-b border-gray-100 pb-2">Club Information</h3>
                     
                     <div>
                         <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-1.5">Club Name *</label>
-                        <input name="club_name" type="text" value="<?php echo e(old('club_name')); ?>" required class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium" placeholder="e.g. Sport Center Casablanca">
+                        <input name="club_name" type="text" value="<?php echo e(old('club_name')); ?>" required class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium" placeholder="e.g. Sport Center">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -133,13 +131,32 @@
                         </div>
                         <div>
                             <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-1.5">Club Email *</label>
-                            <input name="club_email" type="email" value="<?php echo e(old('club_email')); ?>" required class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium" placeholder="contact@monsport.ma">
+                            <input name="club_email" type="email" value="<?php echo e(old('club_email')); ?>" required class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium" placeholder="contact@club.com">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-1.5">Club Description</label>
                         <textarea name="club_description" rows="3" class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium" placeholder="Describe your club..."><?php echo e(old('club_description')); ?></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                        <div>
+                            <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-1.5">Club Logo (Optional)</label>
+                            <input name="club_logo" type="file" accept="image/*" class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-1.5">Cover Image (Optional)</label>
+                            <input name="club_cover_image" type="file" accept="image/*" class="block w-full px-4 py-3 bg-[#f4f5f7] border-transparent text-playtomic-text rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-1.5">Club Location on Map (Optional)</label>
+                        <p class="text-xs text-gray-500 mb-2 font-medium">Click on the map to place a pin at your exact club location.</p>
+                        <div id="registration_map" class="w-full h-[300px] rounded-xl border-2 border-gray-100 z-10"></div>
+                        <input type="hidden" name="club_latitude" id="club_latitude">
+                        <input type="hidden" name="club_longitude" id="club_longitude">
                     </div>
                 </div>
 
@@ -153,5 +170,35 @@
         </div>
     </main>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Default center of Morocco
+            const defaultLat = 31.7917;
+            const defaultLng = -7.0926;
+            
+            const map = L.map('registration_map').setView([defaultLat, defaultLng], 5);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                maxZoom: 20
+            }).addTo(map);
+
+            let marker = null;
+
+            map.on('click', function(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
+
+                document.getElementById('club_latitude').value = lat;
+                document.getElementById('club_longitude').value = lng;
+            });
+        });
+    </script>
 </body>
 </html><?php /**PATH C:\Users\Youcode\Desktop\playreserve\resources\views/auth/owner-register.blade.php ENDPATH**/ ?>

@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Book ' . $terrain->name); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -16,7 +14,6 @@
         </div>
     <?php endif; ?>
 
-    
     <div class="mb-10 text-center md:text-left flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
             <nav class="flex items-center gap-2 text-sm font-bold text-gray-400 mb-4 tracking-wide uppercase">
@@ -38,9 +35,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
         <div class="lg:col-span-2 space-y-8">
-            
             <div class="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm">
                 <h3 class="text-[#0B1526] font-black text-xl mb-6">1. Pick a date</h3>
                 <form action="<?php echo e(route('reservations.create', $terrain->id)); ?>" method="GET" id="dateFilterForm" class="relative group">
@@ -51,7 +46,6 @@
                 </form>
             </div>
 
-            
             <div class="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm min-h-[400px]">
                 <h3 class="text-[#0B1526] font-black text-xl mb-6">2. Select a timeslot</h3>
                 
@@ -105,7 +99,6 @@
             </div>
         </div>
 
-        
         <div class="lg:col-span-1">
             <div class="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm sticky top-28 border-t-8 border-t-playtomic-blue">
                 <h3 class="text-[#0B1526] font-black text-xl mb-6">Booking Summary</h3>
@@ -175,30 +168,21 @@
     const pricePerHour = <?php echo e($terrain->price_per_hour); ?>;
     
     function selectSlot(start, end, btn) {
-        // Remove selection from all buttons
         document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-        
-        // Add selection to clicked button
         btn.classList.add('selected');
         
-        // Update hidden inputs
         document.getElementById('input_start').value = start;
         document.getElementById('input_end').value = end;
         
-        // Calculate price based on duration (simple logic for now, assuming 1h slots if not specified)
-        // In a real app we'd parse the timestamps
         const totalPrice = pricePerHour; 
         document.getElementById('input_price').value = totalPrice;
         
-        // Update UI summary
         document.getElementById('selectionPreview').classList.remove('hidden');
         document.getElementById('timeText').innerText = `${start.substring(0, 5)} to ${end.substring(0, 5)}`;
         document.getElementById('totalPriceText').innerText = parseFloat(totalPrice).toFixed(2);
         
-        // Enable button
         document.getElementById('submitBtn').disabled = false;
         
-        // Smooth scroll to summary on mobile
         if (window.innerWidth < 768) {
             document.getElementById('selectionPreview').scrollIntoView({ behavior: 'smooth' });
         }

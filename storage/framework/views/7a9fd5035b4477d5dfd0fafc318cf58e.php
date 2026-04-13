@@ -2,36 +2,31 @@
 
 <?php $__env->startSection('content'); ?>
 
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col shadow-sm">
-        <div class="w-12 h-12 rounded-xl bg-playtomic-blue/10 text-playtomic-blue flex items-center justify-center text-xl mb-4">
-            <i class="bi bi-building"></i>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 animate-fade-in-up">
+    <div class="bg-white border border-gray-100 rounded-3xl p-8 flex flex-col shadow-sm hover:shadow-md transition-shadow group">
+        <div class="w-14 h-14 rounded-2xl bg-blue-50 text-playtomic-blue flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <i class="bi bi-buildings"></i>
         </div>
-        <div class="text-[#0B1526] font-black text-3xl mb-1"><?php echo e(count($clubs)); ?></div>
-        <div class="text-[14px] font-semibold text-gray-500 uppercase tracking-wide">Total Clubs</div>
+        <div class="text-[#0B1526] font-black text-4xl mb-1 tracking-tight"><?php echo e(count($clubs)); ?></div>
+        <div class="text-[12px] font-black text-gray-400 uppercase tracking-widest">Total Clubs</div>
     </div>
     
-    
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col shadow-sm">
-        <div class="w-12 h-12 rounded-xl bg-playtomic-blue/10 text-playtomic-blue flex items-center justify-center text-xl mb-4">
-            <i class="bi bi-people-fill"></i>
+    <div class="bg-white border border-gray-100 rounded-3xl p-8 flex flex-col shadow-sm hover:shadow-md transition-shadow group">
+        <div class="w-14 h-14 rounded-2xl bg-playtomic-lime/10 text-playtomic-lime flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <i class="bi bi-people"></i>
         </div>
-        <div class="text-[#0B1526] font-black text-3xl mb-1"><?php echo e(count($users)); ?></div>
-        <div class="text-[14px] font-semibold text-gray-500 uppercase tracking-wide">Registered Users</div>
+        <div class="text-[#0B1526] font-black text-4xl mb-1 tracking-tight"><?php echo e(count($users)); ?></div>
+        <div class="text-[12px] font-black text-gray-400 uppercase tracking-widest">Active Users</div>
     </div>
 
-    
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col shadow-sm">
-        <div class="w-12 h-12 rounded-xl bg-playtomic-blue/10 text-playtomic-blue flex items-center justify-center text-xl mb-4">
-            <i class="bi bi-calendar-check-fill"></i>
+    <div class="bg-white border border-gray-100 rounded-3xl p-8 flex flex-col shadow-sm hover:shadow-md transition-shadow group">
+        <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <i class="bi bi-calendar2-range"></i>
         </div>
-        <div class="text-[#0B1526] font-black text-3xl mb-1"><?php echo e(count($reservations)); ?></div>
-        <div class="text-[14px] font-semibold text-gray-500 uppercase tracking-wide">Total Matches</div>
+        <div class="text-[#0B1526] font-black text-4xl mb-1 tracking-tight"><?php echo e(count($reservations)); ?></div>
+        <div class="text-[12px] font-black text-gray-400 uppercase tracking-widest">Total Matches</div>
     </div>
 </div>
-
 
 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
     <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-[#F9FAFC]">

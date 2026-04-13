@@ -28,6 +28,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/reservations/create/{terrain_id}', [ReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     Route::get('/mes-reservations', [ReservationController::class, 'history'])->name('reservations.history');
@@ -44,8 +46,10 @@ Route::get('/owner/dashboard', function () {
 })->name('owner.dashboard');
 
 Route::post('/owner/terrains', [TerrainController::class, 'store'])->name('owner.terrains.store');
+Route::put('/owner/terrains/{id}', [TerrainController::class, 'update'])->name('owner.terrains.update');
 Route::post('/owner/terrains/{id}/creneaux', [CreneauController::class, 'bulkStore'])->name('owner.creneaux.bulk');
 Route::patch('/owner/creneaux/{id}/toggle', [CreneauController::class, 'toggle'])->name('owner.creneaux.toggle');
+Route::put('/owner/club/{id}', [ClubController::class, 'update'])->name('owner.club.update');
 
 Route::get('/admin/dashboard', function () {
     if (!auth()->check() || auth()->user()->role !== 'admin') {

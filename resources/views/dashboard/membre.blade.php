@@ -118,14 +118,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach($clubs as $club)
                     <div class="bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        <div class="h-36 bg-gradient-to-br from-playtomic-blue/5 to-playtomic-lime/10 relative flex items-center justify-center border-b border-gray-100 overflow-hidden">
-                            <i class="bi bi-buildings text-[80px] text-playtomic-blue/10 absolute"></i>
+                        <div class="h-40 relative flex items-center justify-center border-b border-gray-100 overflow-hidden shrink-0">
+                            @if($club->cover_image)
+                                <img src="{{ Storage::url($club->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            @else
+                                <div class="absolute inset-0 bg-gradient-to-br from-playtomic-blue/5 to-playtomic-lime/10"></div>
+                                <i class="bi bi-buildings text-[80px] text-playtomic-blue/10 absolute"></i>
+                            @endif
                             <div class="absolute top-3 right-4 bg-playtomic-lime text-black px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide">
                                 {{ $club->city }}
                             </div>
-                            <div class="absolute bottom-3 left-4 flex gap-1.5 flex-wrap">
+                            <div class="absolute bottom-3 left-4 flex gap-1.5 flex-wrap z-10">
                                 @foreach($club->terrains->pluck('sport_type')->unique() as $sport)
-                                    <span class="bg-white/80 backdrop-blur-sm border border-white px-2.5 py-1 rounded-full text-[10px] font-black text-playtomic-blue uppercase">
+                                    <span class="bg-white/80 backdrop-blur-sm border border-white px-2.5 py-1 rounded-full text-[10px] font-black text-playtomic-blue uppercase shadow-sm">
                                         @if($sport=='football')⚽
                                         @elseif($sport=='basketball')🏀
                                         @elseif($sport=='volleyball')🏐
@@ -136,9 +141,16 @@
                                     </span>
                                 @endforeach
                             </div>
+                            <div class="w-16 h-16 absolute -bottom-8 right-6 rounded-2xl bg-white shadow-md border-2 border-white flex flex-shrink-0 items-center justify-center text-playtomic-blue text-2xl z-20 overflow-hidden">
+                                @if($club->logo)
+                                    <img src="{{ Storage::url($club->logo) }}" class="w-full h-full object-cover">
+                                @else
+                                    <i class="bi bi-shop text-3xl text-gray-300"></i>
+                                @endif
+                            </div>
                         </div>
 
-                        <div class="p-6 flex flex-col flex-1">
+                        <div class="p-6 pt-5 flex flex-col flex-1">
                             <h3 class="text-xl font-black text-[#0B1526] mb-1">{{ $club->name }}</h3>
                             <p class="text-sm text-gray-400 font-medium line-clamp-2 mb-5">{{ $club->description }}</p>
 

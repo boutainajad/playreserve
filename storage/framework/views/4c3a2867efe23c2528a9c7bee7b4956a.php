@@ -1,13 +1,12 @@
-<?php $__env->startSection('title', 'Mon Espace'); ?>
+<?php $__env->startSection('title', 'My Dashboard'); ?>
 
 <?php $__env->startSection('content'); ?>
-
 
 <div class="mb-10">
     <div class="bg-white border border-gray-200 rounded-[28px] p-8 shadow-sm flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-black text-[#0B1526] mb-1 tracking-tight">Bonjour, <?php echo e(auth()->user()->name); ?>!</h1>
-            <p class="text-gray-400 font-medium text-[16px]">Trouvez votre prochain terrain et gérez vos réservations.</p>
+            <h1 class="text-3xl font-black text-[#0B1526] mb-1 tracking-tight">Hello, <?php echo e(auth()->user()->name); ?>!</h1>
+            <p class="text-gray-400 font-medium text-[16px]">Find your next court and manage your bookings.</p>
         </div>
         <div class="w-14 h-14 rounded-full bg-playtomic-blue/10 flex items-center justify-center text-playtomic-blue text-2xl">
             <i class="bi bi-person-fill"></i>
@@ -17,10 +16,9 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    
     <div class="lg:col-span-1">
         <h2 class="text-xl font-black text-[#0B1526] mb-5 flex items-center gap-2">
-            <i class="bi bi-calendar-check-fill text-playtomic-blue"></i> Mes Réservations
+            <i class="bi bi-calendar-check-fill text-playtomic-blue"></i> My Reservations
         </h2>
 
         <?php if($reservations->count() > 0): ?>
@@ -55,7 +53,6 @@
                             <p class="font-black text-playtomic-blue text-base mt-2"><?php echo e(number_format($res->total_price, 0)); ?> DH</p>
                         </div>
                         
-                        
                         <?php if(in_array($res->status, ['confirmed', 'pending'])): ?>
                             <?php
                                 $reservationDateTime = \Carbon\Carbon::parse($res->reservation_date)->setTimeFromTimeString($res->start_time);
@@ -84,23 +81,21 @@
                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="bi bi-calendar-x text-3xl text-gray-300"></i>
                 </div>
-                <p class="text-gray-400 font-bold text-sm">Aucune réservation pour le moment.</p>
+                <p class="text-gray-400 font-bold text-sm">No reservations yet.</p>
             </div>
         <?php endif; ?>
     </div>
 
-    
     <div class="lg:col-span-2">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <h2 class="text-xl font-black text-[#0B1526] flex items-center gap-2">
-                <i class="bi bi-buildings text-playtomic-blue"></i> Tous les Clubs
+                <i class="bi bi-buildings text-playtomic-blue"></i> All Clubs
             </h2>
 
-            
             <form action="<?php echo e(route('dashboard')); ?>" method="GET" class="relative">
                 <select name="city" onchange="this.form.submit()"
                     class="pl-10 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-playtomic-blue shadow-sm min-w-[190px]">
-                    <option value="">📍 Toutes les villes</option>
+                    <option value="">📍 All cities</option>
                     <?php $__currentLoopData = $cities; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $city): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <option value="<?php echo e($city); ?>" <?php echo e(request('city') == $city ? 'selected' : ''); ?>><?php echo e($city); ?></option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -116,8 +111,8 @@
 
         <?php if(request('city')): ?>
             <div class="mb-4 flex items-center gap-2">
-                <span class="text-sm font-bold text-gray-500">Filtré par ville: <span class="text-[#0B1526]"><?php echo e(request('city')); ?></span></span>
-                <a href="<?php echo e(route('dashboard')); ?>" class="text-xs text-playtomic-blue font-bold underline underline-offset-4">Effacer</a>
+                <span class="text-sm font-bold text-gray-500">Filtered by city: <span class="text-[#0B1526]"><?php echo e(request('city')); ?></span></span>
+                <a href="<?php echo e(route('dashboard')); ?>" class="text-xs text-playtomic-blue font-bold underline underline-offset-4">Clear</a>
             </div>
         <?php endif; ?>
 
@@ -125,18 +120,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <?php $__currentLoopData = $clubs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $club): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        
-                        <div class="h-36 bg-gradient-to-br from-playtomic-blue/5 to-playtomic-lime/10 relative flex items-center justify-center border-b border-gray-100 overflow-hidden">
-                            <i class="bi bi-buildings text-[80px] text-playtomic-blue/10 absolute"></i>
-                            
+                        <div class="h-40 relative flex items-center justify-center border-b border-gray-100 overflow-hidden shrink-0">
+                            <?php if($club->cover_image): ?>
+                                <img src="<?php echo e(Storage::url($club->cover_image)); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <?php else: ?>
+                                <div class="absolute inset-0 bg-gradient-to-br from-playtomic-blue/5 to-playtomic-lime/10"></div>
+                                <i class="bi bi-buildings text-[80px] text-playtomic-blue/10 absolute"></i>
+                            <?php endif; ?>
                             <div class="absolute top-3 right-4 bg-playtomic-lime text-black px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wide">
                                 <?php echo e($club->city); ?>
 
                             </div>
-                            
-                            <div class="absolute bottom-3 left-4 flex gap-1.5 flex-wrap">
+                            <div class="absolute bottom-3 left-4 flex gap-1.5 flex-wrap z-10">
                                 <?php $__currentLoopData = $club->terrains->pluck('sport_type')->unique(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sport): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <span class="bg-white/80 backdrop-blur-sm border border-white px-2.5 py-1 rounded-full text-[10px] font-black text-playtomic-blue uppercase">
+                                    <span class="bg-white/80 backdrop-blur-sm border border-white px-2.5 py-1 rounded-full text-[10px] font-black text-playtomic-blue uppercase shadow-sm">
                                         <?php if($sport=='football'): ?>⚽
                                         <?php elseif($sport=='basketball'): ?>🏀
                                         <?php elseif($sport=='volleyball'): ?>🏐
@@ -148,20 +145,27 @@
                                     </span>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
+                            <div class="w-16 h-16 absolute -bottom-8 right-6 rounded-2xl bg-white shadow-md border-2 border-white flex flex-shrink-0 items-center justify-center text-playtomic-blue text-2xl z-20 overflow-hidden">
+                                <?php if($club->logo): ?>
+                                    <img src="<?php echo e(Storage::url($club->logo)); ?>" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <i class="bi bi-shop text-3xl text-gray-300"></i>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
-                        <div class="p-6 flex flex-col flex-1">
+                        <div class="p-6 pt-5 flex flex-col flex-1">
                             <h3 class="text-xl font-black text-[#0B1526] mb-1"><?php echo e($club->name); ?></h3>
                             <p class="text-sm text-gray-400 font-medium line-clamp-2 mb-5"><?php echo e($club->description); ?></p>
 
                             <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                                 <span class="text-xs font-black text-gray-400 uppercase tracking-wide">
-                                    <?php echo e($club->terrains->count()); ?> terrain<?php echo e($club->terrains->count() > 1 ? 's' : ''); ?>
+                                    <?php echo e($club->terrains->count()); ?> court<?php echo e($club->terrains->count() > 1 ? 's' : ''); ?>
 
                                 </span>
                                 <a href="<?php echo e(route('clubs.show', $club->id)); ?>"
                                    class="px-5 py-2.5 bg-playtomic-blue text-white font-black rounded-xl text-[13px] hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                    Réserver <i class="bi bi-arrow-right"></i>
+                                    Book Now <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
@@ -171,8 +175,8 @@
         <?php else: ?>
             <div class="bg-white border border-gray-100 rounded-[24px] p-16 text-center shadow-sm">
                 <i class="bi bi-search text-5xl text-gray-200 mb-4 block"></i>
-                <h4 class="text-lg font-bold text-gray-400">Aucun club trouvé dans cette ville.</h4>
-                <a href="<?php echo e(route('dashboard')); ?>" class="text-playtomic-blue font-black mt-3 inline-block underline underline-offset-4 text-sm">Voir tous les clubs</a>
+                <h4 class="text-lg font-bold text-gray-400">No clubs found in this city.</h4>
+                <a href="<?php echo e(route('dashboard')); ?>" class="text-playtomic-blue font-black mt-3 inline-block underline underline-offset-4 text-sm">See all clubs</a>
             </div>
         <?php endif; ?>
     </div>

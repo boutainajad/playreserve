@@ -1,10 +1,7 @@
-
-
-<?php $__env->startSection('title', 'Paiement'); ?>
+<?php $__env->startSection('title', 'Payment'); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="max-w-4xl mx-auto py-8">
-    
     
     <div class="mb-10 text-center">
         <h1 class="text-4xl font-black text-[#0B1526] tracking-tight mb-2 flex items-center justify-center gap-3">
@@ -14,7 +11,6 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start animate-fade-in-up">
-        
         
         <div class="lg:col-span-3">
             <div class="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm relative overflow-hidden">
@@ -26,7 +22,6 @@
 
                 <form method="POST" action="<?php echo e(route('paiement.process', $reservation->id)); ?>" class="space-y-6">
                     <?php echo csrf_field(); ?>
-                    
                     
                     <div class="group">
                         <label class="block text-[12px] uppercase tracking-widest font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Card Number</label>
@@ -41,7 +36,6 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-6">
-                        
                         <div class="group">
                             <label class="block text-[12px] uppercase tracking-widest font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">CVV</label>
                             <div class="relative">
@@ -52,7 +46,6 @@
                             </div>
                         </div>
 
-                        
                         <div class="group">
                             <label class="block text-[12px] uppercase tracking-widest font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Expires</label>
                             <div class="relative">
@@ -79,13 +72,11 @@
             </div>
         </div>
 
-        
         <div class="lg:col-span-2">
             <div class="bg-[#F8F9FB] border border-gray-100 rounded-[32px] p-8 sticky top-28">
                 <h4 class="text-[#0B1526] font-black text-lg mb-6 uppercase tracking-tight">Booking Summary</h4>
                 
                 <div class="space-y-6">
-                    
                     <div class="flex items-start gap-4">
                         <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-playtomic-blue text-xl flex-shrink-0 border border-gray-100">
                              <?php if($reservation->terrain->sport_type == 'football'): ?> <i class="bi bi-dribbble"></i>
@@ -93,13 +84,12 @@
                              <?php else: ?> <i class="bi bi-grid-3x3-gap-fill"></i> <?php endif; ?>
                         </div>
                         <div>
-                            <div class="text-[11px] font-black text-playtomic-blue uppercase tracking-widest mb-0.5">Terrain</div>
+                            <div class="text-[11px] font-black text-playtomic-blue uppercase tracking-widest mb-0.5">Court</div>
                             <div class="text-base font-bold text-[#0B1526]"><?php echo e($reservation->terrain->name); ?></div>
                             <div class="text-sm text-gray-500 font-medium"><?php echo e($reservation->terrain->club->name); ?>, <?php echo e($reservation->terrain->club->city); ?></div>
                         </div>
                     </div>
 
-                    
                     <div class="flex items-start gap-4">
                         <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-playtomic-lime text-xl flex-shrink-0 border border-gray-100">
                             <i class="bi bi-calendar-range"></i>

@@ -2,9 +2,13 @@
 
 <?php $__env->startSection('content'); ?>
 
-
 <div class="relative bg-playtomic-blue rounded-3xl overflow-hidden mb-10 shadow-lg mt-4 h-[250px] md:h-[300px] flex items-center justify-center">
-    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    <?php if($club->cover_image): ?>
+        <img src="<?php echo e(Storage::url($club->cover_image)); ?>" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/50"></div>
+    <?php else: ?>
+        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    <?php endif; ?>
     <div class="relative z-10 text-center px-4 w-full max-w-4xl">
         <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight"><?php echo e($club->name); ?></h1>
         <div class="flex flex-wrap justify-center items-center gap-4 text-white/90 font-medium text-[15px]">
@@ -16,9 +20,13 @@
 </div>
 
 <div class="flex flex-col lg:flex-row gap-8">
-    
     <div class="w-full lg:w-1/3">
         <div class="bg-white border border-gray-200 rounded-[24px] p-8 sticky top-28 shadow-sm">
+            <?php if($club->logo): ?>
+                <div class="w-20 h-20 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center overflow-hidden mb-6 -mt-16 z-10 relative">
+                    <img src="<?php echo e(Storage::url($club->logo)); ?>" class="w-full h-full object-cover">
+                </div>
+            <?php endif; ?>
             <h3 class="text-[#0B1526] font-black text-xl mb-4">About this club</h3>
             <p class="text-gray-500 font-medium leading-relaxed mb-6 text-[15px]">
                 <?php echo e($club->description); ?>
@@ -28,12 +36,14 @@
             <h4 class="text-[#0B1526] font-bold text-[17px] mb-4">Location</h4>
             <div class="flex items-start gap-3 text-gray-500 font-medium mb-4">
                 <i class="bi bi-geo-alt-fill text-playtomic-blue text-lg mt-0.5"></i>
-                <span><?php echo e($club->city); ?></span>
+                <span><?php echo e($club->address); ?>, <?php echo e($club->city); ?></span>
             </div>
+            <?php if($club->latitude && $club->longitude): ?>
+                <div id="club_map" class="w-full h-[200px] rounded-xl border border-gray-100 z-10 mt-2"></div>
+            <?php endif; ?>
         </div>
     </div>
 
-    
     <div class="w-full lg:w-2/3">
         <h2 class="text-2xl font-black text-[#0B1526] mb-6">Available Courts</h2>
         
@@ -42,23 +52,29 @@
                 <?php $__currentLoopData = $terrains; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $terrain): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="bg-white border border-gray-200 rounded-[20px] p-6 hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-full bg-[#F4F5F7] flex items-center justify-center text-playtomic-blue text-2xl flex-shrink-0">
-                                <?php if($terrain->sport_type == 'football'): ?>
-                                    <i class="bi bi-dribbble"></i>
-                                <?php elseif($terrain->sport_type == 'basketball'): ?>
-                                    <i class="bi bi-basket"></i>
-                                <?php elseif($terrain->sport_type == 'volleyball'): ?>
-                                    <i class="bi bi-circle"></i>
-                                <?php elseif($terrain->sport_type == 'handball'): ?>
-                                    <i class="bi bi-hand-thumbs-up"></i>
-                                <?php elseif($terrain->sport_type == 'piscine'): ?>
-                                    <i class="bi bi-water"></i>
-                                <?php elseif($terrain->sport_type == 'padel'): ?>
-                                    <i class="bi bi-balloon"></i>
-                                <?php else: ?>
-                                    <i class="bi bi-grid-3x3-gap-fill"></i>
-                                <?php endif; ?>
-                            </div>
+                            <?php if($terrain->image): ?>
+                                <div class="w-24 h-24 rounded-2xl bg-gray-100 flex-shrink-0 overflow-hidden shadow-sm">
+                                    <img src="<?php echo e(Storage::url($terrain->image)); ?>" class="w-full h-full object-cover">
+                                </div>
+                            <?php else: ?>
+                                <div class="w-16 h-16 rounded-full bg-[#F4F5F7] flex items-center justify-center text-playtomic-blue text-2xl flex-shrink-0">
+                                    <?php if($terrain->sport_type == 'football'): ?>
+                                        <i class="bi bi-dribbble"></i>
+                                    <?php elseif($terrain->sport_type == 'basketball'): ?>
+                                        <i class="bi bi-basket"></i>
+                                    <?php elseif($terrain->sport_type == 'volleyball'): ?>
+                                        <i class="bi bi-circle"></i>
+                                    <?php elseif($terrain->sport_type == 'handball'): ?>
+                                        <i class="bi bi-hand-thumbs-up"></i>
+                                    <?php elseif($terrain->sport_type == 'piscine'): ?>
+                                        <i class="bi bi-water"></i>
+                                    <?php elseif($terrain->sport_type == 'padel'): ?>
+                                        <i class="bi bi-balloon"></i>
+                                    <?php else: ?>
+                                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
                             <div>
                                 <div class="flex items-center gap-3 mb-1">
                                     <h4 class="text-[#0B1526] font-extrabold text-xl"><?php echo e($terrain->name); ?></h4>
@@ -68,7 +84,7 @@
                                     </span>
                                 </div>
                                 <p class="text-[17px] font-black text-[#0B1526] mt-2">
-                                    <?php echo e(number_format($terrain->price_per_hour, 0)); ?> <span class="text-[13px] text-gray-500 font-semibold uppercase">DH / heure</span>
+                                    <?php echo e(number_format($terrain->price_per_hour, 0)); ?> <span class="text-[13px] text-gray-500 font-semibold uppercase">DH / hour</span>
                                 </p>
                             </div>
                         </div>
@@ -98,6 +114,26 @@
         <?php endif; ?>
     </div>
 </div>
+<?php $__env->startPush('scripts'); ?>
+<?php if($club->latitude && $club->longitude): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lat = <?php echo e($club->latitude); ?>;
+        const lng = <?php echo e($club->longitude); ?>;
+        const map = L.map('club_map').setView([lat, lng], 15);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 20
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup("<div class='text-center'><b class='text-[#0B1526]'><?php echo e($club->name); ?></b><br><span class='text-gray-500'><?php echo e($club->address); ?></span></div>")
+            .openPopup();
+    });
+</script>
+<?php endif; ?>
+<?php $__env->stopPush(); ?>
 
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Youcode\Desktop\playreserve\resources\views/clubs/show.blade.php ENDPATH**/ ?>
