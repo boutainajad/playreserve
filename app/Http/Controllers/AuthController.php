@@ -84,6 +84,8 @@ class AuthController extends Controller
             'club_phone' => 'required|string|max:20',
             'club_email' => 'required|email|unique:clubs,email',
             'club_description' => 'nullable|string',
+            'club_logo' => 'nullable|image|max:2048',
+            'club_cover_image' => 'nullable|image|max:4096',
         ]);
 
         $exists = Club::where('name', $clubData['club_name'])
@@ -94,13 +96,27 @@ class AuthController extends Controller
             return back()->withErrors(['club_name' => 'A club with this name already exists in this city.']);
         }
 
+        $logoPath = null;
+        if ($request->hasFile('club_logo')) {
+            $logoPath = $request->file('club_logo')->store('clubs/logos', 'public');
+        }
+
+        $coverPath = null;
+        if ($request->hasFile('club_cover_image')) {
+            $coverPath = $request->file('club_cover_image')->store('clubs/covers', 'public');
+        }
+
         $club = Club::create([
             'name' => $clubData['club_name'],
             'city' => $clubData['club_city'],
             'address' => $clubData['club_address'],
             'phone' => $clubData['club_phone'],
             'email' => $clubData['club_email'],
-            'description' => $clubData['club_description'],
+            'description' => $clubData['club_description'] ?? null,
+            'logo' => $logoPath,
+            'cover_image' => $coverPath,
+            'latitude' => $request->input('club_latitude'),
+            'longitude' => $request->input('club_longitude'),
             'is_active' => true,
         ]);
 
