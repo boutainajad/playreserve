@@ -5,7 +5,12 @@
 @section('content')
 
 <div class="relative bg-playtomic-blue rounded-3xl overflow-hidden mb-10 shadow-lg mt-4 h-[250px] md:h-[300px] flex items-center justify-center">
-    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    @if($club->cover_image)
+        <img src="{{ Storage::url($club->cover_image) }}" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-black/50"></div>
+    @else
+        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    @endif
     <div class="relative z-10 text-center px-4 w-full max-w-4xl">
         <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">{{ $club->name }}</h1>
         <div class="flex flex-wrap justify-center items-center gap-4 text-white/90 font-medium text-[15px]">
@@ -19,6 +24,11 @@
 <div class="flex flex-col lg:flex-row gap-8">
     <div class="w-full lg:w-1/3">
         <div class="bg-white border border-gray-200 rounded-[24px] p-8 sticky top-28 shadow-sm">
+            @if($club->logo)
+                <div class="w-20 h-20 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center overflow-hidden mb-6 -mt-16 z-10 relative">
+                    <img src="{{ Storage::url($club->logo) }}" class="w-full h-full object-cover">
+                </div>
+            @endif
             <h3 class="text-[#0B1526] font-black text-xl mb-4">About this club</h3>
             <p class="text-gray-500 font-medium leading-relaxed mb-6 text-[15px]">
                 {{ $club->description }}
@@ -27,8 +37,11 @@
             <h4 class="text-[#0B1526] font-bold text-[17px] mb-4">Location</h4>
             <div class="flex items-start gap-3 text-gray-500 font-medium mb-4">
                 <i class="bi bi-geo-alt-fill text-playtomic-blue text-lg mt-0.5"></i>
-                <span>{{ $club->city }}</span>
+                <span>{{ $club->address }}, {{ $club->city }}</span>
             </div>
+            @if($club->latitude && $club->longitude)
+                <div id="club_map" class="w-full h-[200px] rounded-xl border border-gray-100 z-10 mt-2"></div>
+            @endif
         </div>
     </div>
 
@@ -40,23 +53,29 @@
                 @foreach($terrains as $terrain)
                     <div class="bg-white border border-gray-200 rounded-[20px] p-6 hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-full bg-[#F4F5F7] flex items-center justify-center text-playtomic-blue text-2xl flex-shrink-0">
-                                @if($terrain->sport_type == 'football')
-                                    <i class="bi bi-dribbble"></i>
-                                @elseif($terrain->sport_type == 'basketball')
-                                    <i class="bi bi-basket"></i>
-                                @elseif($terrain->sport_type == 'volleyball')
-                                    <i class="bi bi-circle"></i>
-                                @elseif($terrain->sport_type == 'handball')
-                                    <i class="bi bi-hand-thumbs-up"></i>
-                                @elseif($terrain->sport_type == 'piscine')
-                                    <i class="bi bi-water"></i>
-                                @elseif($terrain->sport_type == 'padel')
-                                    <i class="bi bi-balloon"></i>
-                                @else
-                                    <i class="bi bi-grid-3x3-gap-fill"></i>
-                                @endif
-                            </div>
+                            @if($terrain->image)
+                                <div class="w-24 h-24 rounded-2xl bg-gray-100 flex-shrink-0 overflow-hidden shadow-sm">
+                                    <img src="{{ Storage::url($terrain->image) }}" class="w-full h-full object-cover">
+                                </div>
+                            @else
+                                <div class="w-16 h-16 rounded-full bg-[#F4F5F7] flex items-center justify-center text-playtomic-blue text-2xl flex-shrink-0">
+                                    @if($terrain->sport_type == 'football')
+                                        <i class="bi bi-dribbble"></i>
+                                    @elseif($terrain->sport_type == 'basketball')
+                                        <i class="bi bi-basket"></i>
+                                    @elseif($terrain->sport_type == 'volleyball')
+                                        <i class="bi bi-circle"></i>
+                                    @elseif($terrain->sport_type == 'handball')
+                                        <i class="bi bi-hand-thumbs-up"></i>
+                                    @elseif($terrain->sport_type == 'piscine')
+                                        <i class="bi bi-water"></i>
+                                    @elseif($terrain->sport_type == 'padel')
+                                        <i class="bi bi-balloon"></i>
+                                    @else
+                                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                                    @endif
+                                </div>
+                            @endif
                             <div>
                                 <div class="flex items-center gap-3 mb-1">
                                     <h4 class="text-[#0B1526] font-extrabold text-xl">{{ $terrain->name }}</h4>
@@ -95,5 +114,25 @@
         @endif
     </div>
 </div>
+@push('scripts')
+@if($club->latitude && $club->longitude)
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lat = {{ $club->latitude }};
+        const lng = {{ $club->longitude }};
+        const map = L.map('club_map').setView([lat, lng], 15);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 20
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup("<div class='text-center'><b class='text-[#0B1526]'>{{ $club->name }}</b><br><span class='text-gray-500'>{{ $club->address }}</span></div>")
+            .openPopup();
+    });
+</script>
+@endif
+@endpush
 
 @endsection
