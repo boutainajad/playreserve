@@ -10,7 +10,7 @@ class Club extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'description', 'address', 'city', 'phone', 'email', 'is_active'
+        'name', 'description', 'address', 'city', 'phone', 'email', 'is_active', 'logo', 'cover_image', 'latitude', 'longitude'
     ];
 
     public function terrains()
