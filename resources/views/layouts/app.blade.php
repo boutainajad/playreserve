@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
@@ -69,9 +71,12 @@
                                 <div class="font-bold text-[15px] text-playtomic-text truncate">{{ auth()->user()->name }}</div>
                                 <div class="text-xs text-gray-500 font-medium truncate">{{ auth()->user()->email }}</div>
                             </div>
+                            <a href="{{ route('profile.edit') }}" class="w-full text-left px-3 py-2 text-sm text-gray-700 font-semibold hover:bg-gray-50 hover:text-playtomic-blue rounded-xl transition-colors flex items-center gap-2 mb-1">
+                                <i class="bi bi-person-circle"></i> Profil
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="w-full text-left px-3 py-2 text-sm text-red-500 font-semibold hover:bg-gray-50 rounded-xl transition-colors flex items-center gap-2">
+                                <button type="submit" class="w-full text-left px-3 py-2 text-sm text-red-500 font-semibold hover:bg-gray-50 hover:text-red-600 rounded-xl transition-colors flex items-center gap-2">
                                     <i class="bi bi-box-arrow-right"></i> Log out
                                 </button>
                             </form>
@@ -92,9 +97,9 @@
             <i class="bi bi-layers"></i> PLAYRESERVE
         </a>
         @auth
-        <div class="w-9 h-9 rounded-full bg-playtomic-blue text-white flex items-center justify-center font-bold text-sm">
+        <a href="{{ route('profile.edit') }}" class="w-9 h-9 rounded-full bg-playtomic-blue text-white flex items-center justify-center font-bold text-sm shadow-sm transition-transform active:scale-95">
             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-        </div>
+        </a>
         @endauth
     </div>
 
