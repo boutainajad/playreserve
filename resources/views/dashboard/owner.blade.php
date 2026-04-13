@@ -4,14 +4,34 @@
 
 @section('content')
 
-<div class="mb-8">
-    <div class="flex items-center justify-between bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
-        <div>
-            <h1 class="text-2xl font-black text-[#0B1526] mb-1 tracking-tight">Manage your club</h1>
-            <p class="text-[15px] font-medium text-gray-500">You are currently managing <span class="font-bold text-playtomic-blue">{{ $club->name }}</span></p>
-        </div>
-        <div class="w-14 h-14 bg-playtomic-blue/10 rounded-full flex items-center justify-center">
-            <i class="bi bi-shop text-3xl text-playtomic-blue"></i>
+<div class="mb-8 relative rounded-[32px] overflow-hidden shadow-sm border border-gray-200">
+    <div class="h-40 bg-gray-200 w-full relative">
+        @if($club->cover_image)
+            <img src="{{ Storage::url($club->cover_image) }}" class="w-full h-full object-cover">
+        @else
+            <div class="w-full h-full bg-gradient-to-r from-playtomic-blue/20 to-playtomic-lime/20"></div>
+        @endif
+        <div class="absolute inset-0 bg-black/40"></div>
+        <button onclick="openEditClubModal()" class="absolute top-4 right-4 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl text-white font-bold text-sm flex items-center gap-2 transition-all shadow-sm">
+            <i class="bi bi-pencil-square"></i> Edit Club Profile
+        </button>
+    </div>
+    <div class="bg-white p-6 relative">
+        <div class="flex items-center gap-6">
+            <div class="w-24 h-24 bg-white rounded-2xl shadow-lg border-4 border-white -mt-16 relative flex-shrink-0 flex items-center justify-center overflow-hidden">
+                @if($club->logo)
+                    <img src="{{ Storage::url($club->logo) }}" class="w-full h-full object-cover">
+                @else
+                    <i class="bi bi-shop text-4xl text-gray-300"></i>
+                @endif
+            </div>
+            <div class="mt-[-10px]">
+                <h1 class="text-2xl font-black text-[#0B1526] mb-1">{{ $club->name }}</h1>
+                <p class="text-[14px] font-medium text-gray-500 flex items-center gap-3">
+                    <span><i class="bi bi-geo-alt-fill text-playtomic-blue mr-1"></i> {{ $club->city }}</span>
+                    <span><i class="bi bi-telephone-fill text-playtomic-blue mr-1"></i> {{ $club->phone }}</span>
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -69,10 +89,23 @@
         @if($terrains->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($terrains as $terrain)
-                    <div class="bg-white border border-gray-100 rounded-[32px] p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative group shadow-sm">
+                    <div class="bg-white border border-gray-100 rounded-[32px] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative group shadow-sm overflow-hidden">
+                        @if($terrain->image)
+                            <div class="h-36 w-full overflow-hidden shrink-0">
+                                <img src="{{ Storage::url($terrain->image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                        @else
+                            <div class="h-4 w-full shrink-0"></div> <!-- spacing if no image -->
+                        @endif
+                        <div class="p-8 pt-4 flex-1 flex flex-col">
                         <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <h5 class="font-black text-[#0B1526] text-xl mb-1">{{ $terrain->name }}</h5>
+                            <div class="flex-1 w-full relative group/btn">
+                                <div class="flex justify-between items-start w-full gap-2">
+                                    <h5 class="font-black text-[#0B1526] text-xl mb-1 truncate">{{ $terrain->name }}</h5>
+                                    <button onclick='openEditTerrainModal({{ json_encode(["id" => $terrain->id, "name" => $terrain->name, "sport_type" => $terrain->sport_type, "price_per_hour" => $terrain->price_per_hour, "description" => $terrain->description]) }})' class="w-8 h-8 flex-shrink-0 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-playtomic-blue hover:bg-blue-50 transition-colors border border-gray-100">
+                                        <i class="bi bi-pencil-fill text-xs"></i>
+                                    </button>
+                                </div>
                                 <div class="text-[11px] font-black text-playtomic-blue uppercase tracking-widest flex items-center gap-1.5">
                                     @if($terrain->sport_type == 'football') ⚽
                                     @elseif($terrain->sport_type == 'basketball') 🏀
@@ -106,6 +139,7 @@
                             <button onclick="openSlotModal('{{ $terrain->id }}', '{{ $terrain->name }}')" class="w-full py-4 bg-white hover:bg-playtomic-blue hover:text-white border-2 border-gray-100 hover:border-playtomic-blue rounded-24 text-[14px] font-black text-[#0B1526] transition-all flex items-center justify-center gap-2 shadow-sm">
                                 <i class="bi bi-gear-fill"></i> MANAGE SLOTS
                             </button>
+                        </div>
                         </div>
                     </div>
                 @endforeach
@@ -245,15 +279,15 @@
 </div>
 
 <div id="addTerrainModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
-    <div class="bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden animate-fadeInUp">
-        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-[#F9FAFC]">
+    <div class="bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden animate-fadeInUp max-h-[90vh] flex flex-col">
+        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-[#F9FAFC] shrink-0">
             <h3 class="text-[#0B1526] font-black text-2xl">Add Court</h3>
             <button onclick="document.getElementById('addTerrainModal').classList.add('hidden')" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
-        <div class="p-8">
-            <form action="{{ route('owner.terrains.store') }}" method="POST">
+        <div class="p-8 overflow-y-auto">
+            <form action="{{ route('owner.terrains.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-5">
                     <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Court Name</label>
@@ -281,9 +315,14 @@
                     <input type="number" name="price_per_hour" step="0.01" min="0" required placeholder="0" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold text-xl">
                 </div>
 
-                <div class="mb-8">
+                <div class="mb-5">
                     <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Description</label>
                     <textarea name="description" rows="3" placeholder="LED lighting, synthetic grass..." class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium"></textarea>
+                </div>
+
+                <div class="mb-8">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Court Image</label>
+                    <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium text-sm">
                 </div>
 
                 <button type="submit" class="w-full bg-playtomic-blue text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition-colors shadow-lg shadow-playtomic-blue/30">
@@ -294,8 +333,172 @@
     </div>
 </div>
 
+<div id="editClubModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[32px] w-full max-w-2xl shadow-2xl overflow-hidden animate-fadeInUp max-h-[90vh] flex flex-col">
+        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-[#F9FAFC] shrink-0">
+            <h3 class="text-[#0B1526] font-black text-2xl">Edit Club Profile</h3>
+            <button onclick="document.getElementById('editClubModal').classList.add('hidden')" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <div class="p-8 overflow-y-auto">
+            <form action="{{ route('owner.club.update', $club->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                
+                <div class="grid grid-cols-2 gap-6 mb-5">
+                    <div>
+                        <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Club Name</label>
+                        <input type="text" name="name" value="{{ $club->name }}" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">City</label>
+                        <input type="text" name="city" value="{{ $club->city }}" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold">
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Address</label>
+                    <input type="text" name="address" value="{{ $club->address }}" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold">
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Phone</label>
+                    <input type="text" name="phone" value="{{ $club->phone }}" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-6 mb-5">
+                    <div>
+                        <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Club Logo</label>
+                        <input type="file" name="logo" accept="image/*" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Cover Image</label>
+                        <input type="file" name="cover_image" accept="image/*" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium text-sm">
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Club Location on Map</label>
+                    <div id="edit_club_map" class="w-full h-[250px] rounded-xl border-2 border-gray-100 z-10 block"></div>
+                    <input type="hidden" name="latitude" id="edit_latitude" value="{{ $club->latitude }}">
+                    <input type="hidden" name="longitude" id="edit_longitude" value="{{ $club->longitude }}">
+                </div>
+
+                <div class="mb-8">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">About the Club</label>
+                    <textarea name="description" rows="3" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium">{{ $club->description }}</textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-playtomic-blue text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition-colors shadow-lg shadow-playtomic-blue/30">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="editTerrainModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden animate-fadeInUp max-h-[90vh] flex flex-col">
+        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-[#F9FAFC] shrink-0">
+            <h3 class="text-[#0B1526] font-black text-2xl">Edit Court</h3>
+            <button onclick="document.getElementById('editTerrainModal').classList.add('hidden')" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <div class="p-8 overflow-y-auto">
+            <form id="editTerrainForm" action="" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Court Name</label>
+                    <input type="text" name="name" id="edit_terrain_name" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold">
+                </div>
+                
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Sport Type</label>
+                    <div class="relative">
+                        <select name="sport_type" id="edit_terrain_sport_type" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold appearance-none cursor-pointer">
+                            <option value="football">⚽ Football</option>
+                            <option value="basketball">🏀 Basketball</option>
+                            <option value="tennis">🎾 Tennis</option>
+                            <option value="volleyball">🏐 Volleyball</option>
+                            <option value="handball">🤾 Handball</option>
+                            <option value="piscine">🏊 Swimming</option>
+                            <option value="padel">🎯 Padel</option>
+                        </select>
+                        <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Price per Hour (DH)</label>
+                    <input type="number" name="price_per_hour" id="edit_terrain_price" step="0.01" min="0" required class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-bold text-xl">
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Description</label>
+                    <textarea name="description" id="edit_terrain_desc" rows="3" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium"></textarea>
+                </div>
+
+                <div class="mb-8">
+                    <label class="block text-[12px] uppercase tracking-wide font-black text-gray-400 mb-2">Update Image <span class="normal-case font-medium text-gray-400 ml-1">(Optional)</span></label>
+                    <input type="file" name="image" accept="image/*" class="w-full px-4 py-3 bg-[#f4f5f7] border-transparent rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-medium text-sm">
+                </div>
+
+                <button type="submit" class="w-full bg-playtomic-blue text-white font-black py-4 rounded-2xl hover:bg-blue-700 transition-colors shadow-lg shadow-playtomic-blue/30">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+    let editMapInitialized = false;
+    let editMap = null;
+    let editMarker = null;
+
+    function openEditClubModal() {
+        document.getElementById('editClubModal').classList.remove('hidden');
+        
+        if (!editMapInitialized) {
+            // Need a slight delay for the modal to be fully visible so Leaflet can calculate dimensions
+            setTimeout(() => {
+                const latInput = document.getElementById('edit_latitude').value;
+                const lngInput = document.getElementById('edit_longitude').value;
+                
+                let lat = latInput ? parseFloat(latInput) : 31.7917;
+                let lng = lngInput ? parseFloat(lngInput) : -7.0926;
+                let zoom = latInput ? 15 : 5;
+
+                editMap = L.map('edit_club_map').setView([lat, lng], zoom);
+                
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OpenStreetMap contributors',
+                    maxZoom: 20
+                }).addTo(editMap);
+
+                if (latInput) {
+                    editMarker = L.marker([lat, lng]).addTo(editMap);
+                }
+
+                editMap.on('click', function(e) {
+                    if (editMarker) {
+                        editMarker.setLatLng(e.latlng);
+                    } else {
+                        editMarker = L.marker(e.latlng).addTo(editMap);
+                    }
+                    document.getElementById('edit_latitude').value = e.latlng.lat;
+                    document.getElementById('edit_longitude').value = e.latlng.lng;
+                });
+                
+                editMapInitialized = true;
+            }, 200);
+        }
+    }
+
     function openSlotModal(id, name) {
         const modal = document.getElementById('slotModal');
         const form = document.getElementById('bulkSlotForm');
@@ -304,6 +507,16 @@
         nameDisplay.innerText = name;
         form.action = `/owner/terrains/${id}/creneaux`;
         modal.classList.remove('hidden');
+    }
+
+    function openEditTerrainModal(terrain) {
+        document.getElementById('edit_terrain_name').value = terrain.name;
+        document.getElementById('edit_terrain_sport_type').value = terrain.sport_type;
+        document.getElementById('edit_terrain_price').value = terrain.price_per_hour;
+        document.getElementById('edit_terrain_desc').value = terrain.description || '';
+        document.getElementById('editTerrainForm').action = `/owner/terrains/${terrain.id}`;
+        
+        document.getElementById('editTerrainModal').classList.remove('hidden');
     }
 </script>
 @endpush
