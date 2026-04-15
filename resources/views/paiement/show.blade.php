@@ -2,6 +2,36 @@
 
 @section('title', 'Payment')
 
+@push('styles')
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+    .card-input-wrapper {
+        width: 100%;
+        padding: 14px 18px;
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        transition: all 0.2s ease;
+        position: relative;
+        z-index: 10;
+        cursor: text;
+    }
+    .card-input-wrapper.focused {
+        border-color: #3461ff;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(52, 97, 255, 0.1);
+    }
+    .card-input-wrapper.invalid {
+        border-color: #ef4444;
+        background-color: #fef2f2;
+    }
+    .stripe-element-container {
+        min-height: 24px;
+        width: 100%;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto py-8">
     
@@ -15,53 +45,87 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start animate-fade-in-up">
         
         <div class="lg:col-span-3">
-            <div class="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1.5 bg-playtomic-blue"></div>
+            <div class="bg-white border border-gray-200 rounded-[32px] p-8 shadow-sm relative">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-playtomic-blue rounded-t-[32px]"></div>
                 
                 <h3 class="text-[#0B1526] font-black text-xl mb-8 flex items-center gap-2">
                     <i class="bi bi-credit-card-2-back text-playtomic-blue"></i> Payment Method
                 </h3>
 
-                <form method="POST" action="{{ route('paiement.process', $reservation->id) }}" class="space-y-6">
+                <form id="payment-form" method="POST" action="{{ route('paiement.process', $reservation->id) }}" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="payment_intent_id" id="payment_intent_id">
                     
-                    <div class="group">
-                        <label class="block text-[12px] uppercase tracking-widest font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Card Number</label>
-                        <div class="relative">
-                            <input type="text" name="card_number" 
-                                   class="w-full px-6 py-4 bg-[#f4f5f7] border-2 border-transparent rounded-2xl focus:bg-white focus:outline-none focus:ring-0 focus:border-playtomic-blue font-black text-lg transition-all" 
-                                   placeholder="0000 0000 0000 0000" maxlength="16" required>
-                            <div class="absolute right-6 top-1/2 -translate-y-1/2 flex gap-2">
-                                <i class="bi bi-credit-card text-gray-400 text-xl"></i>
+                    @if($isMock)
+                        <div class="space-y-6 animate-fade-in">
+                            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 mb-6 flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </div>
+                                <p class="text-xs text-blue-800 font-medium">
+                                    <span class="font-bold">Sandbox Mode:</span> Use any test card details (e.g. 4242...) to complete this simulation.
+                                </p>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="group">
-                            <label class="block text-[12px] uppercase tracking-widest font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">CVV</label>
-                            <div class="relative">
-                                <input type="text" name="cvv" 
-                                       class="w-full px-6 py-4 bg-[#f4f5f7] border-2 border-transparent rounded-2xl focus:bg-white focus:outline-none focus:ring-0 focus:border-playtomic-blue font-black text-lg transition-all" 
-                                       placeholder="123" maxlength="3" required>
-                                <i class="bi bi-lock absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-1 gap-5">
+                                <div class="relative group">
+                                    <label class="block text-[11px] uppercase tracking-[0.2em] font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Card Number</label>
+                                    <div class="relative">
+                                        <input type="text" id="mock-card-number" placeholder="0000 0000 0000 0000" maxlength="19" class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-playtomic-blue outline-none transition-all font-mono text-lg tracking-wider" required>
+                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 flex gap-1 pointer-events-none opacity-40">
+                                            <i class="bi bi-credit-card-2-front text-xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div class="group">
-                            <label class="block text-[12px] uppercase tracking-widest font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Expires</label>
-                            <div class="relative">
-                                <input type="text" name="expiry_date" 
-                                       class="w-full px-6 py-4 bg-[#f4f5f7] border-2 border-transparent rounded-2xl focus:bg-white focus:outline-none focus:ring-0 focus:border-playtomic-blue font-black text-lg transition-all" 
-                                       placeholder="MM / YY" required>
-                                <i class="bi bi-calendar-event absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div class="group">
+                                        <label class="block text-[11px] uppercase tracking-[0.2em] font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Expiry Date</label>
+                                        <input type="text" id="mock-card-expiry" placeholder="MM / YY" maxlength="7" class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-playtomic-blue outline-none transition-all font-mono text-lg" required>
+                                    </div>
+                                    <div class="group">
+                                        <label class="block text-[11px] uppercase tracking-[0.2em] font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">CVC / CVV</label>
+                                        <input type="password" id="mock-card-cvc" placeholder="***" maxlength="4" class="w-full px-5 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-playtomic-blue outline-none transition-all font-mono text-lg" required>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="space-y-6 animate-fade-in">
+                            <div class="group">
+                                <label class="block text-[11px] uppercase tracking-[0.2em] font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Card Number</label>
+                                <div class="card-input-wrapper" id="card-number-wrapper">
+                                    <div id="card-number-element" class="stripe-element-container"></div>
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" id="card-brand-icon">
+                                        <i class="bi bi-credit-card-2-front text-xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-5">
+                                <div class="group">
+                                    <label class="block text-[11px] uppercase tracking-[0.2em] font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">Expiry Date</label>
+                                    <div class="card-input-wrapper" id="card-expiry-wrapper">
+                                        <div id="card-expiry-element" class="stripe-element-container"></div>
+                                    </div>
+                                </div>
+                                <div class="group">
+                                    <label class="block text-[11px] uppercase tracking-[0.2em] font-black text-gray-400 mb-2 transition-colors group-focus-within:text-playtomic-blue">CVC / CVV</label>
+                                    <div class="card-input-wrapper" id="card-cvc-wrapper">
+                                        <div id="card-cvc-element" class="stripe-element-container"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="card-errors" role="alert" class="text-red-500 text-xs font-bold mt-2 text-center bg-red-50 py-2 rounded-xl hidden"></div>
+                        </div>
+                    @endif
 
                     <div class="pt-4">
-                        <button type="submit" class="w-full py-5 bg-playtomic-blue text-white font-black rounded-2xl transition-all shadow-lg shadow-playtomic-blue/30 hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0.5 flex items-center justify-center gap-3 text-lg">
-                            Pay {{ number_format($reservation->total_price, 0) }} DH <i class="bi bi-arrow-right font-black"></i>
+                        <button id="submit-button" type="submit" class="w-full py-5 bg-playtomic-blue text-white font-black rounded-2xl transition-all shadow-lg shadow-playtomic-blue/30 hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0.5 flex items-center justify-center gap-3 text-lg">
+                            <span id="button-text">Pay {{ number_format($reservation->total_price, 0) }} DH</span>
+                            <i class="bi bi-arrow-right font-black" id="button-icon"></i>
+                            <div id="spinner" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                         </button>
                     </div>
 
@@ -123,4 +187,164 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const isMock = {{ $isMock ? 'true' : 'false' }};
+        const stripeKey = '{{ $stripeKey }}'.trim();
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const spinner = document.getElementById('spinner');
+        const buttonIcon = document.getElementById('button-icon');
+        const buttonText = document.getElementById('button-text');
+        
+        let stripe, elements, card;
+
+        if (!isMock) {
+            try {
+                stripe = Stripe(stripeKey);
+                if (!stripe) throw new Error("Stripe object could not be created.");
+                
+                elements = stripe.elements();
+                
+                const style = {
+                    base: {
+                        color: '#0B1526',
+                        fontFamily: '"Inter", sans-serif',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        '::placeholder': { color: '#94a3b8' }
+                    },
+                    invalid: {
+                        color: '#ef4444'
+                    }
+                };
+
+                const cardNumber = elements.create('cardNumber', { style: style, showIcon: false });
+                const cardExpiry = elements.create('cardExpiry', { style: style });
+                const cardCvc = elements.create('cardCvc', { style: style });
+
+                cardNumber.mount('#card-number-element');
+                cardExpiry.mount('#card-expiry-element');
+                cardCvc.mount('#card-cvc-element');
+                
+                const setupEvents = (element, wrapperId) => {
+                    const wrapper = document.getElementById(wrapperId);
+                    const errorDisplay = document.getElementById('card-errors');
+
+                    element.on('focus', () => wrapper.classList.add('focused'));
+                    element.on('blur', () => wrapper.classList.remove('focused'));
+                    
+                    element.on('change', (event) => {
+                        if (event.error) {
+                            wrapper.classList.add('invalid');
+                            errorDisplay.textContent = event.error.message;
+                            errorDisplay.classList.remove('hidden');
+                        } else {
+                            wrapper.classList.remove('invalid');
+                            errorDisplay.classList.add('hidden');
+                        }
+
+                        if (event.brand && wrapperId === 'card-number-wrapper') {
+                           const icon = document.getElementById('card-brand-icon');
+                           const brands = {
+                               'visa': 'bi-credit-card-2-front',
+                               'mastercard': 'bi-credit-card',
+                               'amex': 'bi-credit-card-2-back',
+                               'unknown': 'bi-credit-card-2-front'
+                           };
+
+                    });
+                };
+
+                setupEvents(cardNumber, 'card-number-wrapper');
+                setupEvents(cardExpiry, 'card-expiry-wrapper');
+                setupEvents(cardCvc, 'card-cvc-wrapper');
+
+                card = cardNumber;
+
+            } catch (error) {
+                console.error("Stripe Error:", error);
+                alert("Stripe Initialization Failed: " + error.message);
+            }
+        } else {
+            const cardNumberInput = document.getElementById('mock-card-number');
+            const cardExpiryInput = document.getElementById('mock-card-expiry');
+
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    value = value.match(/.{1,4}/g)?.join(' ') || value;
+                    e.target.value = value;
+                });
+            }
+
+            if (cardExpiryInput) {
+                cardExpiryInput.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 2) {
+                        value = value.substring(0, 2) + ' / ' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            submitButton.disabled = true;
+            spinner.classList.remove('hidden');
+            buttonIcon.classList.add('hidden');
+            buttonText.innerText = 'Processing...';
+
+            if (isMock) {
+                const cardNumber = document.getElementById('mock-card-number').value.replace(/\s/g, '');
+                if (cardNumber.length < 16) {
+                    setTimeout(() => {
+                        alert('Invalid card number. Please use at least 16 digits.');
+                        submitButton.disabled = false;
+                        spinner.classList.add('hidden');
+                        buttonIcon.classList.remove('hidden');
+                        buttonText.innerText = 'Pay {{ number_format($reservation->total_price, 0) }} DH';
+                    }, 500);
+                    return;
+                }
+
+                setTimeout(() => {
+                    document.getElementById('payment_intent_id').value = 'mock_pi_' + Math.random().toString(36).substr(2, 9);
+                    form.submit();
+                }, 1500);
+                return;
+            }
+
+            const { paymentIntent, error } = await stripe.confirmCardPayment('{{ $clientSecret }}', {
+                payment_method: {
+                    card: card,
+                    billing_details: {
+                        name: '{{ auth()->user()->name }}',
+                        email: '{{ auth()->user()->email }}'
+                    }
+                }
+            });
+
+            if (error) {
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = error.message;
+                
+                submitButton.disabled = false;
+                spinner.classList.add('hidden');
+                buttonIcon.classList.remove('hidden');
+                buttonText.innerText = 'Pay {{ number_format($reservation->total_price, 0) }} DH';
+            } else {
+                if (paymentIntent.status === 'succeeded') {
+                    document.getElementById('payment_intent_id').value = paymentIntent.id;
+                    form.submit();
+                }
+            }
+        });
+    });
+</script>
+@endpush
 @endsection

@@ -43,8 +43,9 @@
                 <form action="{{ route('reservations.create', $terrain->id) }}" method="GET" id="dateFilterForm" class="relative group">
                     <input type="date" name="date" value="{{ $date }}" min="{{ date('Y-m-d') }}" 
                            onchange="document.getElementById('dateFilterForm').submit()"
+                           onclick="this.showPicker()"
                            class="w-full px-6 py-4 bg-[#f4f5f7] border-transparent rounded-2xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-playtomic-blue font-black text-lg transition-all cursor-pointer">
-                    <i class="bi bi-calendar-event absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-playtomic-blue transition-colors"></i>
+                    <i class="bi bi-calendar-event absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-playtomic-blue transition-colors pointer-events-none"></i>
                 </form>
             </div>
 
@@ -55,18 +56,21 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         @foreach($creneaux as $slot)
                             @if($slot->is_reserved)
-                                <button type="button" disabled
-                                        class="relative flex flex-col items-center justify-center py-4 px-2 border-2 border-transparent bg-gray-50/50 cursor-not-allowed rounded-2xl transition-all overflow-hidden">
-                                    <div class="absolute inset-0 bg-gray-100/40 backdrop-blur-[1px] flex items-center justify-center z-10">
-                                        <span class="text-[9px] font-black text-red-500 bg-white border border-red-200 px-2 py-0.5 rounded-full shadow-sm uppercase tracking-tighter transform -rotate-12">RESERVED</span>
-                                    </div>
-                                    <span class="relative text-[15px] font-black text-gray-300">
+                                <div class="relative flex flex-col items-center justify-center py-4 px-2 border-2 border-gray-100 bg-gray-50/30 rounded-2xl transition-all overflow-hidden">
+                                    <span class="text-[13px] font-black text-gray-300 mb-2">
                                         {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }}
                                     </span>
-                                    <span class="relative text-[11px] font-bold text-gray-200 uppercase tracking-wide">
-                                        {{ Carbon\Carbon::parse($slot->duration_minutes ?? 60)->format('g\h') }} session
-                                    </span>
-                                </button>
+                                    <form action="{{ route('reservations.joinWaitlist') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="terrain_id" value="{{ $terrain->id }}">
+                                        <input type="hidden" name="reservation_date" value="{{ $date }}">
+                                        <input type="hidden" name="start_time" value="{{ $slot->start_time }}">
+                                        <input type="hidden" name="end_time" value="{{ $slot->end_time }}">
+                                        <button type="submit" class="text-[9px] font-black text-white bg-playtomic-blue px-3 py-1 rounded-full shadow-sm uppercase tracking-tighter hover:bg-blue-600 transition-colors">
+                                            Waitlist
+                                        </button>
+                                    </form>
+                                </div>
                             @else
                                 <button type="button" 
                                         onclick="selectSlot('{{ $slot->start_time }}', '{{ $slot->end_time }}', this)"
@@ -124,14 +128,25 @@
                         </div>
                     </div>
 
-                    <div id="selectionPreview" class="hidden">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-playtomic-bg flex items-center justify-center text-lg">
-                                <i class="bi bi-clock-fill text-playtomic-blue"></i>
+                    <div id="selectionPreview" class="hidden animate-fadeInUp">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-playtomic-bg flex items-center justify-center text-lg">
+                                    <i class="bi bi-clock-fill text-playtomic-blue"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-[11px] uppercase font-black text-gray-400 tracking-wider">Start Time</div>
+                                    <div id="timeText" class="font-bold text-[#0B1526]">--:--</div>
+                                </div>
                             </div>
-                            <div>
-                                <div class="text-[11px] uppercase font-black text-gray-400 tracking-wider">Time</div>
-                                <div id="timeText" class="font-bold text-[#0B1526]">--:-- to --:--</div>
+
+                            <div class="bg-gray-50 p-4 rounded-2xl">
+                                <label class="block text-[11px] uppercase font-black text-playtomic-blue tracking-wider mb-2">Duration</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button type="button" onclick="updateDuration(60)" class="dur-btn py-2 text-xs font-black rounded-xl border-2 border-transparent bg-white shadow-sm hover:border-playtomic-blue transition-all" id="dur-60">1h</button>
+                                    <button type="button" onclick="updateDuration(90)" class="dur-btn py-2 text-xs font-black rounded-xl border-2 border-transparent bg-white shadow-sm hover:border-playtomic-blue transition-all" id="dur-90">1h30</button>
+                                    <button type="button" onclick="updateDuration(120)" class="dur-btn py-2 text-xs font-black rounded-xl border-2 border-transparent bg-white shadow-sm hover:border-playtomic-blue transition-all" id="dur-120">2h</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -139,7 +154,10 @@
                     <hr class="border-gray-100 my-6">
 
                     <div class="flex items-center justify-between mb-8">
-                        <div class="text-gray-500 font-bold">Total to pay</div>
+                        <div>
+                            <div class="text-gray-500 font-bold">Total price</div>
+                            <div class="text-[10px] text-playtomic-lime font-black uppercase tracking-widest" id="durationStatus">Selected: 60 min</div>
+                        </div>
                         <div class="text-3xl font-black text-[#0B1526]">
                             <span id="totalPriceText">0.00</span> <span class="text-sm">DH</span>
                         </div>
@@ -166,27 +184,55 @@
 @push('scripts')
 <script>
     const pricePerHour = {{ $terrain->price_per_hour }};
+    let selectedStart = null;
+    let selectedDuration = 60;
     
     function selectSlot(start, end, btn) {
         document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         
-        document.getElementById('input_start').value = start;
-        document.getElementById('input_end').value = end;
-        
-        const totalPrice = pricePerHour; 
-        document.getElementById('input_price').value = totalPrice;
+        selectedStart = start;
+        updateCalculation();
         
         document.getElementById('selectionPreview').classList.remove('hidden');
-        document.getElementById('timeText').innerText = `${start.substring(0, 5)} to ${end.substring(0, 5)}`;
-        document.getElementById('totalPriceText').innerText = parseFloat(totalPrice).toFixed(2);
-        
+        document.getElementById('timeText').innerText = start.substring(0, 5);
         document.getElementById('submitBtn').disabled = false;
         
         if (window.innerWidth < 768) {
             document.getElementById('selectionPreview').scrollIntoView({ behavior: 'smooth' });
         }
     }
+
+    function updateDuration(mins) {
+        selectedDuration = mins;
+        document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('border-playtomic-blue', 'text-playtomic-blue'));
+        document.getElementById('dur-' + mins).classList.add('border-playtomic-blue', 'text-playtomic-blue');
+        
+        updateCalculation();
+    }
+
+    function updateCalculation() {
+        if (!selectedStart) return;
+
+        const [hours, minutes] = selectedStart.split(':').map(Number);
+        const startDate = new Date();
+        startDate.setHours(hours, minutes, 0);
+        
+        const endDate = new Date(startDate.getTime() + selectedDuration * 60000);
+        const endStr = endDate.getHours().toString().padStart(2, '0') + ':' + endDate.getMinutes().toString().padStart(2, '0');
+
+        const totalPrice = (pricePerHour / 60) * selectedDuration;
+        
+        document.getElementById('input_start').value = selectedStart;
+        document.getElementById('input_end').value = endStr;
+        document.getElementById('input_price').value = totalPrice;
+        
+        document.getElementById('totalPriceText').innerText = parseFloat(totalPrice).toFixed(2);
+        document.getElementById('durationStatus').innerText = `Selected: ${selectedDuration} min`;
+    }
+
+
+    updateDuration(60);
 </script>
 <style>
     .animate-fadeInUp {
