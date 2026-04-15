@@ -23,4 +23,10 @@ return [
         ],
     ],
 
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'mock' => filter_var(env('STRIPE_MOCK', false), FILTER_VALIDATE_BOOLEAN),
+    ],
+
 ];

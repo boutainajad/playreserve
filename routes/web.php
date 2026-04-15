@@ -11,12 +11,13 @@ use App\Http\Controllers\TerrainController;
 use App\Models\Club;
 
 Route::get('/', function () {
-    $clubs = Club::take(3)->get();
+    $clubs = App\Models\Club::take(9)->get();
     return view('welcome', compact('clubs'));
 })->name('home');
 
 Route::get('/clubs', [ClubController::class, 'index'])->name('clubs.index');
 Route::get('/clubs/{id}', [ClubController::class, 'show'])->name('clubs.show');
+Route::get('/search', [TerrainController::class, 'search'])->name('search');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -36,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
     Route::get('/paiement/{reservation_id}', [PaiementController::class, 'show'])->name('paiement.show');
     Route::post('/paiement/{reservation_id}', [PaiementController::class, 'process'])->name('paiement.process');
+    Route::post('/waitlist', [ReservationController::class, 'joinWaitlist'])->name('reservations.joinWaitlist');
 });
 
 Route::get('/owner/dashboard', function () {

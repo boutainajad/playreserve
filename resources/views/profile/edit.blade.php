@@ -12,7 +12,6 @@
     </div>
 
     <div class="bg-white rounded-[24px] shadow-sm border border-gray-100 p-8 mb-8 relative overflow-hidden">
-        <!-- Decoration -->
         <div class="absolute -right-20 -top-20 w-64 h-64 bg-playtomic-lime/5 rounded-full blur-3xl z-0"></div>
         <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-playtomic-blue/5 rounded-full blur-3xl z-0"></div>
 

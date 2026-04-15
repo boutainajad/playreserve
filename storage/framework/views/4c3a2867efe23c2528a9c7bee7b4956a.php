@@ -11,7 +11,46 @@
         <div class="w-14 h-14 rounded-full bg-playtomic-blue/10 flex items-center justify-center text-playtomic-blue text-2xl">
             <i class="bi bi-person-fill"></i>
         </div>
-    </div>
+</div>
+
+<div class="mb-10 bg-white border border-gray-200 rounded-[28px] p-8 shadow-sm">
+    <h2 class="text-xl font-black text-[#0B1526] mb-5 flex items-center gap-2">
+        <i class="bi bi-search text-playtomic-blue"></i> Find a Court
+    </h2>
+    <form action="<?php echo e(route('search')); ?>" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-4 flex items-center shadow-none pointer-events-none text-gray-400">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <input type="text" name="city" placeholder="City..." class="w-full pl-10 px-4 py-3.5 bg-[#f4f5f7] border-none rounded-xl focus:bg-white focus:ring-2 focus:ring-playtomic-blue font-bold transition-all">
+        </div>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+                <i class="bi bi-award-fill"></i>
+            </div>
+            <select name="sport_type" class="w-full pl-10 px-4 py-3.5 bg-[#f4f5f7] border-none rounded-xl focus:bg-white focus:ring-2 focus:ring-playtomic-blue font-bold appearance-none transition-all cursor-pointer">
+                <option value="">All sports</option>
+                <option value="football">Football</option>
+                <option value="basketball">Basketball</option>
+                <option value="padel">Padel</option>
+            </select>
+        </div>
+        <div class="relative">
+             <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+                <i class="bi bi-calendar-event-fill"></i>
+            </div>
+            <input type="date" name="date" class="w-full pl-10 px-4 py-3.5 bg-[#f4f5f7] border-none rounded-xl focus:bg-white focus:ring-2 focus:ring-playtomic-blue font-bold transition-all" min="<?php echo e(date('Y-m-d')); ?>">
+        </div>
+        <div class="relative">
+             <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+                <i class="bi bi-clock-fill"></i>
+            </div>
+            <input type="time" name="time" class="w-full pl-10 px-4 py-3.5 bg-[#f4f5f7] border-none rounded-xl focus:bg-white focus:ring-2 focus:ring-playtomic-blue font-bold transition-all cursor-pointer" step="1800">
+        </div>
+        <button type="submit" class="bg-playtomic-blue text-white font-black py-3.5 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-playtomic-blue/30 text-[15px]">
+            Search Courts
+        </button>
+    </form>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -28,7 +28,7 @@ class CreneauController extends Controller
         $days = $validated['days'];
         $startTime = Carbon::createFromFormat('H:i', $validated['start_time']);
         $endTime = Carbon::createFromFormat('H:i', $validated['end_time']);
-        $duration = $validated['duration'];
+        $duration = (int) $validated['duration'];
 
         $count = 0;
 

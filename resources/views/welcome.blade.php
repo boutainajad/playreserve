@@ -56,6 +56,15 @@
             color: #121212;
         }
         
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        
         .squiggly-svg {
             position: absolute;
             bottom: -30px;
@@ -109,10 +118,13 @@
                     Find matches and courts for Football, Basketball, Volleyball and more.<br> Connect anytime, anywhere
                 </p>
                 
-                <div class="bg-white rounded-full p-2 pl-6 pr-2 mt-2 flex items-center shadow-xl w-full max-w-[550px] relative">
-                    <svg class="w-6 h-6 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" placeholder="Address, club, city..." class="w-full py-4 bg-transparent border-none focus:outline-none focus:ring-0 text-[#222] placeholder-gray-500 font-medium text-lg">
-                </div>
+                <form action="{{ route('clubs.index') }}" method="GET" class="bg-white rounded-full p-2 pl-6 pr-2 mt-2 flex items-center shadow-xl w-full max-w-[550px] relative">
+                    <svg class="w-6 h-6 text-gray-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" name="name" placeholder="Rechercher un club par nom..." class="w-full py-4 bg-transparent border-none focus:outline-none focus:ring-0 text-[#222] placeholder-gray-500 font-medium text-lg">
+                    <button type="submit" class="bg-playtomic-lime text-black rounded-full px-8 py-3 ml-2 font-black hover:bg-playtomic-limedark transition-colors shrink-0">
+                        Chercher
+                    </button>
+                </form>
             </div>
             
             <div class="w-full lg:w-[45%] mt-16 lg:mt-0 relative hidden md:block z-10 h-[500px]">
@@ -155,10 +167,19 @@
             
             <h2 class="text-3xl font-black text-[#0B1526] tracking-tight mb-10">Top searched clubs worldwide</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+            <div class="relative group/slider">
+                
+                <button id="slider-prev" class="absolute -left-6 top-[40%] -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-playtomic-blue z-20 opacity-0 group-hover/slider:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer">
+                    <i class="bi bi-chevron-left text-xl"></i>
+                </button>
+                <button id="slider-next" class="absolute -right-6 top-[40%] -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-playtomic-blue z-20 opacity-0 group-hover/slider:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer">
+                    <i class="bi bi-chevron-right text-xl"></i>
+                </button>
+
+                <div id="clubs-slider" class="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-8 pt-2 px-2 -mx-2">
                 
                 @forelse($clubs as $club)
-                <div class="bg-[#F8F9FB] border border-[#EAEDF1] rounded-[24px] overflow-hidden flex flex-col group relative shadow-sm hover:shadow-lg transition-all duration-300">
+                <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0 snap-start bg-[#F8F9FB] border border-[#EAEDF1] rounded-[24px] overflow-hidden flex flex-col group relative shadow-sm hover:shadow-lg transition-all duration-300">
                     <div class="h-40 w-full relative bg-gray-100 overflow-hidden shrink-0 border-b border-[#EAEDF1]">
                         @if($club->cover_image)
                             <img src="{{ Storage::url($club->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -276,5 +297,39 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.getElementById('clubs-slider');
+            const prev = document.getElementById('slider-prev');
+            const next = document.getElementById('slider-next');
+
+            if(slider && prev && next) {
+                const itemWidth = slider.querySelector('div.shrink-0')?.clientWidth || 300;
+                const scrollAmount = itemWidth + 24; 
+
+                prev.addEventListener('click', () => {
+                    slider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                });
+                
+                next.addEventListener('click', () => {
+                    slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+                
+                const updateButtons = () => {
+                    prev.disabled = slider.scrollLeft <= 0;
+                    next.disabled = slider.scrollLeft >= (slider.scrollWidth - slider.clientWidth - 5);
+                };
+                
+                slider.addEventListener('scroll', updateButtons);
+                window.addEventListener('resize', updateButtons);
+                
+                updateButtons();
+                if (slider.scrollWidth <= slider.clientWidth) {
+                    next.style.display = 'none';
+                    prev.style.display = 'none';
+                }
+            }
+        });
+    </script>
 </body>
 </html>

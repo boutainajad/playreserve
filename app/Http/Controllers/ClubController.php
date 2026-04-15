@@ -15,6 +15,10 @@ class ClubController extends Controller
             $query->where('city', 'like', '%' . $request->city . '%');
         }
 
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
         if ($request->filled('sport_type')) {
             $query->whereHas('terrains', function ($q) use ($request) {
                 $q->where('sport_type', $request->sport_type);
@@ -43,9 +47,6 @@ class ClubController extends Controller
         $club = Club::findOrFail($id);
 
         if (auth()->user()->role !== 'owner' || auth()->user()->id !== $club->user_id && auth()->user()->club_id !== $club->id) {
-            // we will let it pass if owner is associated with club
-            // wait, owner belongsTo club or club belongsTo user?
-            // Users table has club_id!
         }
         
         if (auth()->user()->role !== 'owner') {

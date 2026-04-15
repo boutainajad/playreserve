@@ -95,7 +95,7 @@
                                 <img src="{{ Storage::url($terrain->image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             </div>
                         @else
-                            <div class="h-4 w-full shrink-0"></div> <!-- spacing if no image -->
+                            <div class="h-4 w-full shrink-0"></div>
                         @endif
                         <div class="p-8 pt-4 flex-1 flex flex-col">
                         <div class="flex justify-between items-start mb-6">
@@ -464,7 +464,6 @@
         document.getElementById('editClubModal').classList.remove('hidden');
         
         if (!editMapInitialized) {
-            // Need a slight delay for the modal to be fully visible so Leaflet can calculate dimensions
             setTimeout(() => {
                 const latInput = document.getElementById('edit_latitude').value;
                 const lngInput = document.getElementById('edit_longitude').value;

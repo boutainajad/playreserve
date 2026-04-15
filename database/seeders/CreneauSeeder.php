@@ -55,6 +55,6 @@ class CreneauSeeder extends Seeder
             }
         }
 
-        $this->command->info("✅ Created {$count} creneaux for {$terrains->count()} terrain(s).");
+        $this->command->info("Created {$count} creneaux for {$terrains->count()} terrain(s).");
     }
 }

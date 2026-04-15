@@ -1,33 +1,26 @@
-# 🏟️ PlayReserve - Plateforme de Réservation de Terrains Sportifs
+# PlayReserve - Plateforme de Reservation de Terrains Sportifs
 
-## 📝 Description
-PlayReserve est une plateforme web permettant la réservation en ligne de terrains sportifs. Les utilisateurs peuvent réserver des terrains, les propriétaires de clubs peuvent gérer leurs installations, et un administrateur supervise l'ensemble de la plateforme.
+## Description
+PlayReserve est une plateforme web pour reserver des terrains de sport en ligne. Les utilisateurs peuvent reserver des terrains, les proprietaires de clubs peuvent gerer leurs terrains, et il y a un administrateur pour gerer le tout.
    
-## 👥 Rôles Utilisateurs
-- **Admin** : Gère toute la plateforme (clubs, utilisateurs, réservations)
-- **Owner** : Propriétaire d'un club, gère ses terrains et réservations
-- **Membre** : Utilisateur qui réserve des terrains
+## Roles Utilisateurs
+- Admin : Gere toute la plateforme.
+- Owner : Proprietaire d'un club, gere ses terrains.
+- Membre : Utilisateur qui fait les reservations.
 
----
+## Installation
 
-## 🛠️ Prérequis
+Pour lancer le projet :
 
-Avant de commencer, assurez-vous d'avoir installé:
+1. Cloner le projet.
+2. Installer les dependances avec `composer install` et `npm install`.
+3. Creer le fichier `.env` et generer la cle avec `php artisan key:generate`.
+4. Configurer la base de donnes.
+5. Lancer les migrations avec `php artisan migrate --seed`.
+6. Lancer le serveur avec `php artisan serve`.
 
-- **PHP** >= 8.1
-- **Composer** (Gestionnaire de dépendances PHP)
-- **SQLite** ou **MySQL** (Base de données)
-- **Node.js** et **NPM** (Optionnel pour les assets)
-
----
-
-## 📦 Installation Complète
-
-### Étape 1: Créer le projet Laravel
-
-```bash
-# Créer un nouveau projet Laravel
-composer create-project laravel/laravel playreserve
-
-# Entrer dans le dossier
-cd playreserve
+## Technologies utilisees
+- Laravel
+- Tailwind CSS
+- MySQL / SQLite
+- Stripe (pour le paiement)

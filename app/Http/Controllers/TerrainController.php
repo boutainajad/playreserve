@@ -78,4 +78,40 @@ class TerrainController extends Controller
 
         return redirect()->route('owner.dashboard')->with('success', 'Terrain updated successfully!');
     }
+
+    public function search(Request $request)
+    {
+        $query = Terrain::with('club');
+        
+        if ($request->filled('city')) {
+            $query->whereHas('club', function ($q) use ($request) {
+                $q->where('city', 'like', '%' . $request->city . '%');
+            });
+        }
+        
+        if ($request->filled('sport_type')) {
+            $query->where('sport_type', $request->sport_type);
+        }
+        
+        if ($request->filled('date') && $request->filled('time')) {
+            $date = $request->date;
+            $time = $request->time;
+            $dayOfWeek = date('l', strtotime($date));
+            
+            $query->whereHas('creneaux', function ($creneauQuery) use ($dayOfWeek, $time) {
+                $creneauQuery->where('day_of_week', $dayOfWeek)
+                             ->where('is_available', true)
+                             ->where('start_time', '<=', $time)
+                             ->where('end_time', '>', $time);
+            })->whereDoesntHave('reservations', function ($resQuery) use ($date, $time) {
+                $resQuery->where('reservation_date', $date)
+                         ->whereIn('status', ['pending', 'confirmed'])
+                         ->where('start_time', '<=', $time)
+                         ->where('end_time', '>', $time);
+            });
+        }
+        
+        $terrains = $query->get();
+        return view('terrains.search', compact('terrains'));
+    }
 }

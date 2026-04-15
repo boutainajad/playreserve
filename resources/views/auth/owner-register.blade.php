@@ -172,7 +172,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Default center of Morocco
             const defaultLat = 31.7917;
             const defaultLng = -7.0926;
             
