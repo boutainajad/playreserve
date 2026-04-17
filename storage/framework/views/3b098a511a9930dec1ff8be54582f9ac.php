@@ -231,7 +231,7 @@
         document.getElementById('durationStatus').innerText = `Selected: ${selectedDuration} min`;
     }
 
-    // Default duration
+
     updateDuration(60);
 </script>
 <style>
