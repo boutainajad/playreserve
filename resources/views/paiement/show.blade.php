@@ -247,14 +247,18 @@
                         }
 
                         if (event.brand && wrapperId === 'card-number-wrapper') {
-                           const icon = document.getElementById('card-brand-icon');
-                           const brands = {
-                               'visa': 'bi-credit-card-2-front',
-                               'mastercard': 'bi-credit-card',
-                               'amex': 'bi-credit-card-2-back',
-                               'unknown': 'bi-credit-card-2-front'
-                           };
-
+                            const iconContainer = document.getElementById('card-brand-icon');
+                            const icon = iconContainer.querySelector('i');
+                            const brands = {
+                                'visa': 'bi-credit-card-2-front',
+                                'mastercard': 'bi-credit-card',
+                                'amex': 'bi-credit-card-2-back',
+                                'unknown': 'bi-credit-card-2-front'
+                            };
+                            
+                            const brandIcon = brands[event.brand] || brands['unknown'];
+                            icon.className = `bi ${brandIcon} text-xl`;
+                        }
                     });
                 };
 

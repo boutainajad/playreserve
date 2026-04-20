@@ -227,7 +227,6 @@
                 cardExpiry.mount('#card-expiry-element');
                 cardCvc.mount('#card-cvc-element');
                 
-                // Helper to manage wrapper styles
                 const setupEvents = (element, wrapperId) => {
                     const wrapper = document.getElementById(wrapperId);
                     const errorDisplay = document.getElementById('card-errors');
@@ -245,16 +244,18 @@
                             errorDisplay.classList.add('hidden');
                         }
 
-                        // Update Brand Icon for Card Number
                         if (event.brand && wrapperId === 'card-number-wrapper') {
-                           const icon = document.getElementById('card-brand-icon');
-                           const brands = {
-                               'visa': 'bi-credit-card-2-front',
-                               'mastercard': 'bi-credit-card',
-                               'amex': 'bi-credit-card-2-back',
-                               'unknown': 'bi-credit-card-2-front'
-                           };
-                           // Standard icons might not have all brands, but we'll try to show something
+                            const iconContainer = document.getElementById('card-brand-icon');
+                            const icon = iconContainer.querySelector('i');
+                            const brands = {
+                                'visa': 'bi-credit-card-2-front',
+                                'mastercard': 'bi-credit-card',
+                                'amex': 'bi-credit-card-2-back',
+                                'unknown': 'bi-credit-card-2-front'
+                            };
+                            
+                            const brandIcon = brands[event.brand] || brands['unknown'];
+                            icon.className = `bi ${brandIcon} text-xl`;
                         }
                     });
                 };
@@ -263,7 +264,6 @@
                 setupEvents(cardExpiry, 'card-expiry-wrapper');
                 setupEvents(cardCvc, 'card-cvc-wrapper');
 
-                // Assign to top-level card for the submit handler (Stripe will find the other elements)
                 card = cardNumber;
 
             } catch (error) {
@@ -271,7 +271,6 @@
                 alert("Stripe Initialization Failed: " + error.message);
             }
         } else {
-            // Handle Mock UI interactions
             const cardNumberInput = document.getElementById('mock-card-number');
             const cardExpiryInput = document.getElementById('mock-card-expiry');
 
